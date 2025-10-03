@@ -1,1 +1,61 @@
+And Subset Count (Bitwise Operations) -
 
+#include <bits/stdc++.h>
+using namespace std;
+
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
+    const int MOD = 1'000'000'007;
+
+    int n; 
+    if (!(cin >> n)) return 0;
+    vector<int> a(n);
+    for (int i = 0; i < n; ++i) cin >> a[i];
+
+    int B = 0;
+    while ((1 << B) <= n) ++B;
+    int M = 1 << B;
+
+    vector<int> freq(M, 0);
+    for (int v : a) ++freq[v];
+
+    vector<int> cnt(M, 0);
+    for (int k = 0; k < M; ++k) {
+        int s = k, c = 0;
+        while (s < M) {
+            c += freq[s];
+            s = (s + 1) | k;
+        }
+        cnt[k] = c;
+    }
+
+    vector<int> pow2(n + 1, 1);
+    for (int i = 1; i <= n; ++i) pow2[i] = (pow2[i - 1] * 2LL) % MOD;
+
+    vector<int> F(M, 0);
+    for (int mask = 0; mask < M; ++mask) {
+        int ways = pow2[cnt[mask]] - 1;
+        if (ways < 0) ways += MOD;
+        F[mask] = ways;
+    }
+
+    for (int b = 0; b < B; ++b) {
+        for (int mask = 0; mask < M; ++mask) {
+            if ((mask & (1 << b)) == 0) {
+                F[mask] -= F[mask | (1 << b)];
+                if (F[mask] < 0) F[mask] += MOD;
+            }
+        }
+    }
+
+    for (int k = 0; k <= n; ++k) {
+        if (k) cout << ' ';
+        cout << F[k];
+    }
+    cout << '\n';
+    return 0;
+}
+
+
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
