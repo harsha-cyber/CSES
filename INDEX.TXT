@@ -242,3 +242,61 @@ int main() {
 
 
 XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+Sliding Window Inversions(Sliding Window Problems)
+
+#include <bits/stdc++.h>
+using namespace std;
+
+struct Fenwick {
+    int n;
+    vector<long long> f;
+    Fenwick(int n=0): n(n), f(n+1,0) {}
+    void add(int i, long long v){ for(; i<=n; i+=i&-i) f[i]+=v; }
+    long long sum(int i) const { long long s=0; for(; i>0; i-=i&-i) s+=f[i]; return s; }
+    long long sum_all() const { return sum(n); }
+};
+
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
+
+    int n, k;
+    if (!(cin >> n >> k)) return 0;
+    vector<long long> a(n), comp;
+    comp.reserve(n);
+    for (int i = 0; i < n; ++i) { cin >> a[i]; comp.push_back(a[i]); }
+    sort(comp.begin(), comp.end());
+    comp.erase(unique(comp.begin(), comp.end()), comp.end());
+    auto rank_of = [&](long long x) {
+        return int(lower_bound(comp.begin(), comp.end(), x) - comp.begin()) + 1; // 1-based
+    };
+    int m = (int)comp.size();
+    Fenwick ft(m);
+
+    long long inv = 0;
+    for (int j = 0; j < k; ++j) {
+        int r = rank_of(a[j]);
+        inv += j - ft.sum(r);
+        ft.add(r, 1);
+    }
+
+    int windows = n - k + 1;
+    for (int w = 0; w < windows; ++w) {
+        cout << inv << (w + 1 == windows ? '\n' : ' ');
+        if (w + 1 == windows) break;
+
+        int rL = rank_of(a[w]);
+        long long lessThanL = ft.sum(rL - 1);
+        inv -= lessThanL;
+        ft.add(rL, -1);
+
+        int rR = rank_of(a[w + k]);
+        long long greaterThanR = ft.sum_all() - ft.sum(rR);
+        inv += greaterThanR;
+        ft.add(rR, 1);
+    }
+    return 0;
+}
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
