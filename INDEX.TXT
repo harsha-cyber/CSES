@@ -155,3 +155,38 @@ int main() {
 }
 
 XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+Number of Subset Xors(Bitwise Operations)
+
+
+#include <bits/stdc++.h>
+using namespace std;
+
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
+
+    int n; 
+    if (!(cin >> n)) return 0;
+    const int MAXB = 60;
+    vector<unsigned long long> basis(MAXB + 1, 0);
+
+    for (int i = 0; i < n; ++i) {
+        unsigned long long x; 
+        cin >> x;
+        for (int b = MAXB; b >= 0; --b) {
+            if (!((x >> b) & 1ULL)) continue;
+            if (!basis[b]) { basis[b] = x; break; }
+            x ^= basis[b];
+        }
+    }
+
+    int rank = 0;
+    for (auto v : basis) if (v) ++rank;
+
+    unsigned long long ans = 1ULL << rank;
+    cout << ans << '\n';
+    return 0;
+}
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
