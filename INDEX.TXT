@@ -85,3 +85,73 @@ int main() {
 }
 
 XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+K Subset Xors(Bitwise Operations)
+
+#include <bits/stdc++.h>
+using namespace std;
+
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
+
+    int n, k;
+    if (!(cin >> n >> k)) return 0;
+    const int MAXB = 60;
+    vector<unsigned long long> basis(MAXB + 1, 0);
+
+    for (int i = 0; i < n; ++i) {
+        unsigned long long x;
+        cin >> x;
+        for (int b = MAXB; b >= 0; --b) {
+            if (!(x >> b & 1ULL)) continue;
+            if (!basis[b]) { basis[b] = x; break; }
+            x ^= basis[b];
+        }
+    }
+
+    for (int i = 0; i <= MAXB; ++i) if (basis[i])
+        for (int j = 0; j <= MAXB; ++j) if (i != j && basis[j] && (basis[j] >> i & 1ULL))
+            basis[j] ^= basis[i];
+
+    vector<unsigned long long> vecs;
+    for (int b = MAXB; b >= 0; --b) if (basis[b]) vecs.push_back(basis[b]);
+    int r = (int)vecs.size();
+
+    unsigned long long repeats;
+    if (n - r >= 62) repeats = k;
+    else {
+        unsigned long long w = 1ULL << (n - r);
+        repeats = min<unsigned long long>(w, k);
+    }
+    int need = (int)((k + repeats - 1) / repeats);
+    if (need == 0) need = 1;
+
+    vector<unsigned long long> S = {0};
+    for (auto b : vecs) {
+        size_t L = min<unsigned long long>((unsigned long long)S.size() * 2ULL, (unsigned long long)need);
+        vector<unsigned long long> merged;
+        merged.reserve(L);
+        size_t i = 0, j = 0;
+        while (merged.size() < L) {
+            unsigned long long v1 = (i < S.size()) ? S[i] : ULLONG_MAX;
+            unsigned long long v2 = (j < S.size()) ? (S[j] ^ b) : ULLONG_MAX;
+            if (v1 <= v2) { merged.push_back(v1); ++i; }
+            else { merged.push_back(v2); ++j; }
+        }
+        S.swap(merged);
+    }
+
+    long long printed = 0;
+    for (size_t i = 0; i < S.size() && printed < k; ++i) {
+        unsigned long long cnt = min<unsigned long long>(repeats, k - printed);
+        while (cnt--) {
+            cout << S[i];
+            ++printed;
+            if (printed < k) cout << ' ';
+        }
+    }
+    cout << '\n';
+    return 0;
+}
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
